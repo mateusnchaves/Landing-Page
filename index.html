@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusBud — Produtividade com Inteligência Artificial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #6C63FF;
+      --color-primary-light: #8B85FF;
+      --color-primary-dark: #4A42CC;
+      --color-primary-glow: rgba(108, 99, 255, 0.25);
+      --color-secondary: #1D9E75;
+      --color-secondary-light: #28C78E;
+      --color-secondary-glow: rgba(29, 158, 117, 0.2);
+      --color-bg: #08080F;
+      --color-bg-alt: #0C0C18;
+      --color-card: #121220;
+      --color-card-hover: #181830;
+      --color-text: #EEEEF4;
+      --color-text-muted: #8888A0;
+      --color-text-light: #5A5A78;
+      --color-white: #181830;
+      --color-border: rgba(255, 255, 255, 0.05);
+      --color-border-strong: rgba(255, 255, 255, 0.10);
+      --color-glass: rgba(18, 18, 32, 0.8);
+      --color-glass-border: rgba(255, 255, 255, 0.06);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-2xl: 36px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+      --shadow-md: 0 8px 30px rgba(0,0,0,0.3);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+      --shadow-xl: 0 40px 80px rgba(0,0,0,0.5);
+      --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.15);
+      --max-width: 1200px;
+      --nav-height: 72px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    body {
+      font-family: var(--font);
+      color: var(--color-text);
+      background: var(--color-bg);
+      overflow-x: hidden;
+      line-height: 1.6;
+      cursor: default;
+    }
+
+    ::selection { background: var(--color-primary); color: white; }
+
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    /* SPOTLIGHT */
+    #spotlight {
+      position: fixed; pointer-events: none; z-index: 9999;
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 99, 255, 0.03) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+      will-change: transform;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0; height: var(--nav-height);
+      display: flex; align-items: center;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .navbar::before {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(8, 8, 15, 0);
+      backdrop-filter: blur(0px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .navbar.scrolled::before {
+      background: rgba(8, 8, 15, 0.85);
+      backdrop-filter: blur(24px) saturate(1.4);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    .navbar .container {
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1; width: 100%;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 800; font-size: 1.25rem;
+      color: var(--color-text);
+      transition: opacity 0.3s;
+    }
+    .logo:hover { opacity: 0.8; }
+    .logo-icon {
+      width: 80px; height: 80px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+    .nav-links a:not(.nav-cta) {
+      font-size: 0.875rem; font-weight: 500; color: var(--color-text-muted);
+      transition: color 0.3s; position: relative;
+      padding: 4px 0;
+    }
+    .nav-links a:not(.nav-cta)::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1.5px;
+      background: var(--color-primary); transform: scaleX(0);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .nav-links a:not(.nav-cta):hover { color: var(--color-text); }
+    .nav-links a:not(.nav-cta):hover::after { transform: scaleX(1); }
+    .nav-cta {
+      display: inline-flex; align-items: center;
+      padding: 10px 24px; background: var(--color-primary); color: white;
+      border-radius: 50px; font-weight: 600; font-size: 0.875rem;
+      transition: all 0.3s;
+    }
+    .nav-cta:hover { background: var(--color-primary-light); color: white; transform: translateY(-2px); box-shadow: 0 4px 20px var(--color-primary-glow); }
+    .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; z-index: 1001; }
+    .mobile-toggle span { width: 22px; height: 2px; background: var(--color-text); border-radius: 2px; transition: all 0.3s; }
+
+    /* HERO */
+    .hero {
+      position: relative; min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 0 80px; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 45%, rgba(108, 99, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 85% 35%, rgba(29, 158, 117, 0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 50% 80%, rgba(108, 99, 255, 0.03) 0%, transparent 70%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 65% 55% at 50% 50%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 50%, black 20%, transparent 70%);
+    }
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none;
+    }
+    .hero-orb-1 {
+      width: 500px; height: 500px; top: -150px; right: -80px;
+      background: rgba(108, 99, 255, 0.08); animation: orb1 18s ease-in-out infinite;
+    }
+    .hero-orb-2 {
+      width: 350px; height: 350px; bottom: -60px; left: -60px;
+      background: rgba(29, 158, 117, 0.05); animation: orb2 22s ease-in-out infinite reverse;
+    }
+    .hero-orb-3 {
+      width: 250px; height: 250px; top: 35%; left: 55%;
+      background: rgba(108, 99, 255, 0.04); animation: orb3 15s ease-in-out infinite;
+    }
+    @keyframes orb1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(25px, -35px) scale(1.03); } }
+    @keyframes orb2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-20px, 25px) scale(1.02); } }
+    @keyframes orb3 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(15px, -15px) scale(1.04); } }
+
+    .hero-particles {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+    }
+    .particle {
+      position: absolute; width: 3px; height: 3px; border-radius: 50%;
+      background: var(--color-primary); opacity: 0.2;
+    }
+
+    .hero-content { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 12px 5px 5px;
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(12px);
+      border-radius: 50px; font-size: 0.78rem; font-weight: 500; color: var(--color-text-muted);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 28px;
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .hero-badge-dot {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      border-radius: 50px; color: white; font-weight: 600; font-size: 0.68rem;
+    }
+    .hero-badge-pulse { width: 5px; height: 5px; background: var(--color-secondary-light); border-radius: 50%; animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 4.8vw, 4rem); font-weight: 900; line-height: 1.05;
+      letter-spacing: -0.035em; margin-bottom: 20px;
+      animation: fadeUp 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 40%, var(--color-secondary) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p {
+      font-size: clamp(0.95rem, 1.15vw, 1.1rem); color: var(--color-text-muted);
+      max-width: 480px; line-height: 1.75; margin-bottom: 36px;
+      animation: fadeUp 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .hero-actions {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 0.9rem;
+      border: none; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font); position: relative; overflow: hidden;
+    }
+    .btn-primary {
+      background: var(--color-primary); color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px var(--color-primary-glow);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04); color: var(--color-text);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08); transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    .hero-metrics {
+      display: flex; gap: 36px; margin-top: 48px;
+      animation: fadeUp 0.8s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .hero-metric-value {
+      font-size: 1.5rem; font-weight: 800; color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+    .hero-metric-label { font-size: 0.78rem; color: var(--color-text-light); font-weight: 500; margin-top: 2px; }
+
+    /* HERO VISUAL */
+    .hero-visual {
+      position: relative; perspective: 1200px;
+      animation: fadeUp 1s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .mockup-frame {
+      position: relative; width: 100%; max-width: 580px;
+      transform: rotateY(-3deg) rotateX(2deg);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mockup-frame:hover { transform: rotateY(0deg) rotateX(0deg); }
+
+    .mockup-body {
+      background: #0C0C1A; border-radius: 18px; padding: 14px 14px 0;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.03);
+      position: relative; overflow: hidden;
+    }
+    .mockup-topbar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px 10px;
+    }
+    .mockup-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .mockup-dot:nth-child(1) { background: #ff5f57; }
+    .mockup-dot:nth-child(2) { background: #febc2e; }
+    .mockup-dot:nth-child(3) { background: #28c840; }
+    .mockup-topbar-space { flex: 1; }
+    .mockup-topbar-icon { width: 14px; height: 14px; border-radius: 4px; background: rgba(255,255,255,0.03); }
+
+    .mockup-screen {
+      background: #06060E; border-radius: 10px; overflow: hidden;
+      aspect-ratio: 16/10; position: relative;
+    }
+    .mockup-glow {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 45% at 25% 35%, rgba(108, 99, 255, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 75% 65%, rgba(29, 158, 117, 0.05) 0%, transparent 70%);
+      z-index: 0;
+    }
+    .dash {
+      position: relative; z-index: 1; padding: 16px; height: 100%;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .dash-top { display: flex; justify-content: space-between; align-items: center; }
+    .dash-top-left { display: flex; align-items: center; gap: 8px; }
+    .dash-logo {
+      width: 18px; height: 18px; border-radius: 5px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    }
+    .dash-top-label { font-size: 0.55rem; color: rgba(255,255,255,0.35); font-weight: 500; letter-spacing: 0.3px; }
+    .dash-top-right { display: flex; gap: 6px; }
+    .dash-top-right span { width: 12px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.05); }
+
+    .dash-body {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1;
+    }
+    .dash-left { display: flex; flex-direction: column; gap: 8px; }
+    .dash-timer-box {
+      background: rgba(255,255,255,0.02); border-radius: 10px;
+      padding: 14px; border: 1px solid rgba(255,255,255,0.03);
+      text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .dash-timer-label { font-size: 0.45rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .dash-timer-ring {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: conic-gradient(var(--color-primary) 0%, var(--color-secondary) 68%, rgba(255,255,255,0.03) 68%);
+      display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 6px;
+    }
+    .dash-timer-ring::before {
+      content: ''; position: absolute; width: 54px; height: 54px; border-radius: 50%; background: #06060E;
+    }
+    .dash-timer-num { position: relative; z-index: 1; color: white; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px; }
+    .dash-timer-status {
+      font-size: 0.5rem; color: var(--color-secondary-light); font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .dash-timer-status::before {
+      content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--color-secondary-light);
+      animation: pulse 2s infinite;
+    }
+
+    .dash-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    }
+    .dash-item {
+      background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .dash-item-label { font-size: 0.4rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+    .dash-item-value { font-size: 0.6rem; color: white; font-weight: 700; margin-top: 2px; }
+
+    .dash-right { display: flex; flex-direction: column; gap: 8px; }
+    .dash-chart {
+      background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px;
+      border: 1px solid rgba(255,255,255,0.03); flex: 1;
+    }
+    .dash-chart-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .dash-chart-label { font-size: 0.45rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+    .dash-chart-value { font-size: 0.7rem; color: white; font-weight: 700; }
+    .dash-bars { display: flex; align-items: flex-end; gap: 4px; height: 40px; }
+    .dash-bar {
+      flex: 1; border-radius: 2px 2px 0 0;
+      background: linear-gradient(to top, rgba(108,99,255,0.3), rgba(108,99,255,0.08));
+      transition: height 0.6s, background 0.6s;
+    }
+    .dash-bar:nth-child(1) { height: 60%; }
+    .dash-bar:nth-child(2) { height: 75%; }
+    .dash-bar:nth-child(3) { height: 45%; }
+    .dash-bar:nth-child(4) { height: 90%; }
+    .dash-bar:nth-child(5) { height: 55%; }
+    .dash-bar:nth-child(6) { height: 80%; }
+    .dash-bar:nth-child(7) { height: 65%; }
+    .dash-bar.active { background: linear-gradient(to top, var(--color-primary), var(--color-primary-light)); }
+
+    .dash-insights {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    }
+    .dash-insight {
+      background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .dash-insight-label { font-size: 0.4rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.5px; }
+    .dash-insight-value { font-size: 0.55rem; color: white; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .dash-insight-badge {
+      font-size: 0.35rem; padding: 1px 4px; border-radius: 4px; background: rgba(29, 158, 117, 0.2);
+      color: var(--color-secondary-light); font-weight: 600;
+    }
+
+    .mockup-badge {
+      position: absolute; bottom: -16px; left: -16px;
+      background: rgba(12,12,26,0.9); backdrop-filter: blur(20px);
+      border-radius: 12px; padding: 12px 16px;
+      box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; gap: 10px;
+      animation: float 6s ease-in-out infinite;
+      z-index: 3;
+    }
+    .mockup-badge-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-light));
+      display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.7rem;
+    }
+    .mockup-badge-text { font-size: 0.7rem; font-weight: 600; color: var(--color-text); line-height: 1.3; }
+    .mockup-badge-sub { font-size: 0.6rem; color: var(--color-text-muted); }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* SECTION */
+    section { padding: 120px 0; position: relative; }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: rgba(108, 99, 255, 0.08);
+      border-radius: 50px; font-size: 0.75rem; font-weight: 600; color: var(--color-primary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; line-height: 1.12;
+      letter-spacing: -0.025em; margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 0.95rem; color: var(--color-text-muted); max-width: 540px; line-height: 1.7;
+    }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-header .section-sub { margin: 0 auto; }
+
+    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.16s; }
+    .reveal-d3 { transition-delay: 0.24s; }
+    .reveal-d4 { transition-delay: 0.32s; }
+
+    /* PROBLEM */
+    .problem { overflow: hidden; }
+    .problem-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .problem-text .section-title { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .problem-card {
+      padding: 24px 20px; border-radius: var(--radius-md);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative; overflow: hidden;
+    }
+    .problem-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+      background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary));
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .problem-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(108,99,255,0.12); }
+    .problem-card:hover::before { opacity: 1; }
+    .problem-stat {
+      font-size: 1.8rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1;
+    }
+    .problem-card h4 { font-size: 0.9rem; font-weight: 700; margin: 4px 0 4px; color: var(--color-text); }
+    .problem-card p { font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; }
+
+    /* FEATURES */
+    .features { overflow: hidden; background: var(--color-bg-alt); }
+    .features-showcase {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .features-list {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .features-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 24px; border-radius: var(--radius-md);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+    }
+    .features-item:hover {
+      transform: translateX(6px);
+      border-color: rgba(108, 99, 255, 0.12);
+      box-shadow: var(--shadow-sm);
+    }
+    .features-item.active {
+      border-color: rgba(108, 99, 255, 0.2);
+      background: var(--color-card-hover);
+    }
+    .features-item-icon {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(108,99,255,0.04));
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .features-item-content { flex: 1; }
+    .features-item-content h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .features-item-content p { font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.6; }
+    .features-item-arrow {
+      color: var(--color-text-light); font-size: 1rem; margin-top: 4px;
+      transition: transform 0.3s;
+    }
+    .features-item:hover .features-item-arrow { transform: translateX(4px); color: var(--color-primary); }
+
+    .features-visual {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .features-card-highlight {
+      background: linear-gradient(135deg, var(--color-card), var(--color-card-hover));
+      border-radius: var(--radius-xl);
+      padding: 48px 36px;
+      border: 1px solid rgba(108, 99, 255, 0.08);
+      width: 100%; max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      position: relative; overflow: hidden;
+    }
+    .features-card-highlight::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--color-primary), var(--color-secondary), transparent);
+    }
+    .features-card-icon {
+      font-size: 2.4rem; margin-bottom: 16px;
+    }
+    .features-card-title {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .features-card-desc {
+      font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 20px;
+    }
+    .features-card-tags {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .features-card-tag {
+      padding: 4px 12px; border-radius: 50px;
+      background: rgba(108,99,255,0.08); color: var(--color-primary);
+      font-size: 0.7rem; font-weight: 600;
+    }
+    .features-indicators {
+      display: flex; gap: 6px; justify-content: center; margin-top: 20px;
+    }
+    .features-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--color-border); border: none;
+      cursor: pointer; transition: all 0.3s; padding: 0;
+    }
+    .features-dot.active { background: var(--color-primary); width: 24px; border-radius: 4px; }
+
+    /* COMPARISON */
+    .comparison { overflow: hidden; }
+    .table-wrap {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--color-border);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+    }
+    .comp-table {
+      width: 100%; border-collapse: collapse; min-width: 680px;
+      font-size: 0.85rem;
+    }
+    .comp-table thead th {
+      padding: 20px 16px; text-align: center; font-weight: 700;
+      background: var(--color-card); border-bottom: 1px solid var(--color-border);
+      font-size: 0.8rem; color: var(--color-text);
+    }
+    .comp-table thead th:first-child { text-align: left; padding-left: 24px; width: 200px; }
+    .comp-table tbody td {
+      padding: 14px 16px; text-align: center;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+    }
+    .comp-table tbody td:first-child { text-align: left; padding-left: 24px; font-weight: 500; color: var(--color-text); }
+    .comp-table tbody tr:last-child td { border-bottom: none; }
+    .comp-table tbody tr:hover td { background: rgba(108, 99, 255, 0.02); }
+    .comp-table .hl {
+      background: rgba(108, 99, 255, 0.04);
+      position: relative;
+    }
+    .comp-table .hl::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary));
+    }
+    .comp-check { color: var(--color-secondary); font-weight: 700; font-size: 1rem; }
+    .comp-dash { color: var(--color-text-light); opacity: 0.2; }
+    .comp-product { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .comp-product-name { font-weight: 700; font-size: 0.8rem; color: var(--color-text); }
+    .comp-product-price { font-size: 0.65rem; color: var(--color-text-light); }
+    .comp-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: white; font-size: 0.55rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 50px; margin-bottom: 4px;
+    }
+
+    /* BENEFITS */
+    .benefits { overflow: hidden; background: var(--color-bg-alt); }
+    .benefits-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .benefits-list {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .benefit-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 22px; border-radius: var(--radius-md);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      transition: all 0.4s;
+    }
+    .benefit-row:hover {
+      transform: translateX(6px); box-shadow: var(--shadow-sm);
+      border-color: rgba(108, 99, 255, 0.1);
+    }
+    .benefit-row-icon {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(108,99,255,0.02));
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .benefit-row-content { flex: 1; }
+    .benefit-row-value {
+      font-size: 1.3rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1;
+    }
+    .benefit-row-label { font-weight: 600; font-size: 0.88rem; margin-top: 2px; }
+    .benefit-row-desc { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px; }
+    .benefit-row-bar {
+      width: 80px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.04);
+      overflow: hidden; flex-shrink: 0;
+    }
+    .benefit-row-bar-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      width: 0; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .benefits-circle-wrap {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .benefits-circle {
+      width: 280px; height: 280px; border-radius: 50%;
+      background: conic-gradient(var(--color-primary) 0%, var(--color-primary-light) 30%, var(--color-secondary) 55%, rgba(255,255,255,0.02) 55%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; animation: spin 40s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .benefits-circle-inner {
+      width: 180px; height: 180px; border-radius: 50%;
+      background: var(--color-bg-alt); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; animation: spin 40s linear infinite reverse;
+    }
+    .benefits-circle-pct { font-size: 2.8rem; font-weight: 900; color: var(--color-primary); line-height: 1; }
+    .benefits-circle-label { font-size: 0.8rem; color: var(--color-text-muted); font-weight: 500; margin-top: 4px; }
+
+    /* HOW */
+    .how { overflow: hidden; }
+    .how-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .how-card {
+      text-align: center; padding: 36px 20px; border-radius: var(--radius-lg);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .how-card:hover {
+      transform: translateY(-8px); box-shadow: var(--shadow-lg);
+      border-color: rgba(108, 99, 255, 0.12);
+      background: var(--color-card-hover);
+    }
+    .how-num {
+      width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 18px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      color: white; font-size: 1.1rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.4s;
+    }
+    .how-card:hover .how-num { box-shadow: 0 0 0 6px rgba(108,99,255,0.12); }
+    .how-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .how-card p { font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.6; }
+
+    /* TESTIMONIALS */
+    .testimonials { overflow: hidden; background: var(--color-bg-alt); }
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .testi-card {
+      padding: 32px 28px; border-radius: var(--radius-lg);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column;
+    }
+    .testi-card:hover {
+      transform: translateY(-6px); box-shadow: var(--shadow-md);
+      border-color: rgba(108, 99, 255, 0.1);
+    }
+    .testi-card.featured {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(108,99,255,0.04));
+      border-color: rgba(108, 99, 255, 0.08);
+    }
+    .testi-stars { color: #f6b83e; font-size: 0.85rem; margin-bottom: 16px; letter-spacing: 2px; }
+    .testi-text {
+      font-size: 0.88rem; line-height: 1.7; color: var(--color-text-muted); margin-bottom: 20px;
+      flex: 1;
+    }
+    .testi-card.featured .testi-text { color: var(--color-text); }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;
+    }
+    .testi-card.featured .testi-avatar { background: rgba(255,255,255,0.08); }
+    .testi-name { font-weight: 600; font-size: 0.85rem; }
+    .testi-role { font-size: 0.75rem; color: var(--color-text-light); }
+
+    /* CTA */
+    .cta {
+      background: linear-gradient(135deg, #0C0C1A, #08080F);
+      padding: 120px 0;
+      overflow: hidden; position: relative;
+    }
+    .cta-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 50%, rgba(108, 99, 255, 0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 70% 50%, rgba(29, 158, 117, 0.04) 0%, transparent 70%);
+    }
+    .cta-grid {
+      position: absolute; inset: 0; overflow: hidden;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+    }
+    .cta .container { position: relative; z-index: 1; text-align: center; }
+    .cta h2 {
+      color: white; font-size: clamp(2rem, 3.8vw, 3.2rem); font-weight: 800;
+      line-height: 1.12; letter-spacing: -0.025em; margin-bottom: 14px;
+    }
+    .cta p {
+      color: var(--color-text-muted); font-size: 1rem; margin-bottom: 40px;
+      max-width: 480px; margin-left: auto; margin-right: auto;
+      line-height: 1.7;
+    }
+    .cta .btn-primary {
+      background: var(--color-primary); color: white;
+      font-size: 1rem; padding: 16px 40px;
+    }
+    .cta .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 50px var(--color-primary-glow);
+    }
+    .cta-meta { color: var(--color-text-light); font-size: 0.8rem; margin-top: 20px; }
+    .cta-meta strong { color: var(--color-text-muted); font-weight: 500; }
+
+    /* FOOTER */
+    .footer {
+      background: #06060C; padding: 64px 0 28px; color: rgba(255,255,255,0.4);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .logo { color: white; margin-bottom: 16px; font-size: 1.15rem; }
+    .footer-brand p { font-size: 0.8rem; line-height: 1.7; max-width: 300px; }
+    .footer-col h4 { color: white; font-weight: 600; font-size: 0.82rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul a { font-size: 0.8rem; color: rgba(255,255,255,0.3); transition: color 0.3s; }
+    .footer-col ul a:hover { color: rgba(255,255,255,0.7); }
+    .footer-social { display: flex; gap: 10px; margin-top: 20px; }
+    .footer-social a {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.25); font-size: 0.8rem; transition: all 0.3s;
+    }
+    .footer-social a:hover { background: var(--color-primary); color: white; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.03);
+      padding-top: 24px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; color: rgba(255,255,255,0.2);
+    }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: rgba(255,255,255,0.2); transition: color 0.3s; }
+    .footer-bottom-links a:hover { color: rgba(255,255,255,0.4); }
+
+    /* RESPONSIVE */
+    @media (max-width: 968px) {
+      .hero-content { grid-template-columns: 1fr; gap: 48px; text-align: center; }
+      .hero p { margin: 0 auto 36px; }
+      .hero-actions { justify-content: center; }
+      .hero-metrics { justify-content: center; }
+      .problem-layout { grid-template-columns: 1fr; gap: 40px; }
+      .features-showcase { grid-template-columns: 1fr; gap: 48px; }
+      .features-visual { order: -1; }
+      .benefits-layout { grid-template-columns: 1fr; gap: 48px; }
+      .benefits-circle-wrap { order: -1; }
+      .how-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(8, 8, 15, 0.97);
+        backdrop-filter: blur(20px);
+        flex-direction: column; justify-content: center; gap: 28px;
+        z-index: 999;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.2rem; }
+      .mobile-toggle { display: flex; }
+      .mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+      .mobile-toggle.active span:nth-child(2) { opacity: 0; }
+      .mobile-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+      .hero { min-height: auto; padding: 100px 0 60px; }
+      .hero h1 { font-size: clamp(2rem, 7vw, 2.6rem); }
+      .testi-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; text-align: center; }
+      .footer-brand p { margin: 0 auto; }
+      .footer-social { justify-content: center; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      section { padding: 80px 0; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions .btn { justify-content: center; }
+      .hero-metrics { gap: 20px; flex-wrap: wrap; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .comp-table { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="spotlight"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="logo">
+        <span class="logo-icon"><img src="logo/image-removebg-preview.png" alt="FocusBud" /></span>
+        FocusBud
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features">Funcionalidades</a></li>
+        <li><a href="#how">Como funciona</a></li>
+        <li><a href="#testimonials">Depoimentos</a></li>
+        <li><a href="#cta" class="nav-cta">Começar Grátis</a></li>
+      </ul>
+      <div class="mobile-toggle" id="mobileToggle">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+    <div class="hero-particles" id="particles"></div>
+
+    <div class="container">
+      <div class="hero-content">
+        <div>
+          <div class="hero-badge">
+            <span class="hero-badge-dot"><span class="hero-badge-pulse"></span> IA</span>
+            Lançamento oficial — Produtividade adaptativa
+          </div>
+          <h1>Transforme <span class="highlight">distração</span> em produtividade.</h1>
+          <p>
+            O primeiro app que combina Inteligência Artificial, Pomodoro Inteligente,
+            música lo-fi e análise de hábitos para potencializar seus estudos.
+          </p>
+          <div class="hero-actions">
+            <a href="#cta" class="btn btn-primary">Começar Agora</a>
+            <a href="#features" class="btn btn-secondary">Ver Funcionalidades</a>
+          </div>
+          <div class="hero-metrics">
+            <div>
+              <div class="hero-metric-value"><span class="count-up" data-target="10">0</span>K+</div>
+              <div class="hero-metric-label">Estudantes ativos</div>
+            </div>
+            <div>
+              <div class="hero-metric-value"><span class="count-up" data-target="92">0</span>%</div>
+              <div class="hero-metric-label">Satisfação</div>
+            </div>
+            <div>
+              <div class="hero-metric-value"><span class="count-up" data-target="500">0</span>K+</div>
+              <div class="hero-metric-label">Horas de foco</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="mockup-frame">
+            <div class="mockup-body">
+              <div class="mockup-topbar">
+                <div class="mockup-dot"></div>
+                <div class="mockup-dot"></div>
+                <div class="mockup-dot"></div>
+                <div class="mockup-topbar-space"></div>
+                <div class="mockup-topbar-icon"></div>
+                <div class="mockup-topbar-icon"></div>
+              </div>
+              <div class="mockup-screen">
+                <div class="mockup-glow"></div>
+                <div class="dash">
+                  <div class="dash-top">
+                    <div class="dash-top-left">
+                      <div class="dash-logo"></div>
+                      <span class="dash-top-label">FocusBud</span>
+                    </div>
+                    <div class="dash-top-right">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                  <div class="dash-body">
+                    <div class="dash-left">
+                      <div class="dash-timer-box">
+                        <div class="dash-timer-label">Ciclo Atual</div>
+                        <div class="dash-timer-ring">
+                          <span class="dash-timer-num">25:00</span>
+                        </div>
+                        <div class="dash-timer-status">Foco</div>
+                      </div>
+                      <div class="dash-grid">
+                        <div class="dash-item">
+                          <div class="dash-item-label">Hoje</div>
+                          <div class="dash-item-value">4h 32min</div>
+                        </div>
+                        <div class="dash-item">
+                          <div class="dash-item-label">Meta</div>
+                          <div class="dash-item-value">6h</div>
+                        </div>
+                        <div class="dash-item">
+                          <div class="dash-item-label">Sessões</div>
+                          <div class="dash-item-value">8 / 10</div>
+                        </div>
+                        <div class="dash-item">
+                          <div class="dash-item-label">Distrações</div>
+                          <div class="dash-item-value">3</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="dash-right">
+                      <div class="dash-chart">
+                        <div class="dash-chart-top">
+                          <span class="dash-chart-label">Produtividade</span>
+                          <span class="dash-chart-value">92%</span>
+                        </div>
+                        <div class="dash-bars" id="dashBars">
+                          <div class="dash-bar active"></div>
+                          <div class="dash-bar active"></div>
+                          <div class="dash-bar"></div>
+                          <div class="dash-bar active"></div>
+                          <div class="dash-bar"></div>
+                          <div class="dash-bar active"></div>
+                          <div class="dash-bar"></div>
+                        </div>
+                      </div>
+                      <div class="dash-insights">
+                        <div class="dash-insight">
+                          <div class="dash-insight-label">Foco Médio</div>
+                          <div class="dash-insight-value">52min <span class="dash-insight-badge">+12%</span></div>
+                        </div>
+                        <div class="dash-insight">
+                          <div class="dash-insight-label">IA Recomenda</div>
+                          <div class="dash-insight-value">Pausa 5min</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mockup-badge">
+            <div class="mockup-badge-icon">IA</div>
+            <div>
+              <div class="mockup-badge-text">Analisando seu perfil</div>
+              <div class="mockup-badge-sub">Adaptando ciclos de foco</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <div class="problem-layout">
+        <div class="problem-text reveal">
+          <div class="section-label">O Problema</div>
+          <h2 class="section-title">Por que estudantes não conseguem manter o foco?</h2>
+          <p class="section-sub">A distração digital é a maior barreira para a produtividade. Dados mostram o impacto real nos estudos.</p>
+        </div>
+        <div class="problem-grid reveal reveal-d1">
+          <div class="problem-card">
+            <div class="problem-stat">58%</div>
+            <h4>Falta de Concentração</h4>
+            <p>Se sentem improdutivos após usar redes sociais durante os estudos.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-stat">72%</div>
+            <h4>Procrastinação</h4>
+            <p>Adiam o início dos estudos por não conseguir se organizar.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-stat">4,5h</div>
+            <h4>Redes Sociais</h4>
+            <p>Horas perdidas por dia em distrações digitais sem perceber.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-stat">65%</div>
+            <h4>Sem Método</h4>
+            <p>Não possuem uma rotina estruturada de estudos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">Funcionalidades</div>
+        <h2 class="section-title">Tudo que você precisa em um só lugar</h2>
+        <p class="section-sub">Uma plataforma completa com tecnologia de IA para transformar sua rotina de estudos.</p>
+      </div>
+      <div class="features-showcase">
+        <div class="features-list reveal">
+          <div class="features-item active" data-feature="0">
+            <div class="features-item-icon">🧠</div>
+            <div class="features-item-content">
+              <h3>IA Adaptativa</h3>
+              <p>Ajusta automaticamente seus ciclos de foco baseado no seu comportamento e padrões de distração.</p>
+            </div>
+            <span class="features-item-arrow">→</span>
+          </div>
+          <div class="features-item" data-feature="1">
+            <div class="features-item-icon">⏱️</div>
+            <div class="features-item-content">
+              <h3>Pomodoro Inteligente</h3>
+              <p>Sessões personalizadas que se adaptam ao seu ritmo. O cronômetro aprende quando você rende mais.</p>
+            </div>
+            <span class="features-item-arrow">→</span>
+          </div>
+          <div class="features-item" data-feature="2">
+            <div class="features-item-icon">🎵</div>
+            <div class="features-item-content">
+              <h3>Música Lo-fi para Foco</h3>
+              <p>Playlist integrada com músicas selecionadas para concentração profunda sem interrupções.</p>
+            </div>
+            <span class="features-item-arrow">→</span>
+          </div>
+          <div class="features-item" data-feature="3">
+            <div class="features-item-icon">📊</div>
+            <div class="features-item-content">
+              <h3>Relatórios Inteligentes</h3>
+              <p>Análises visuais com métricas de desempenho e insights para melhorar seus hábitos.</p>
+            </div>
+            <span class="features-item-arrow">→</span>
+          </div>
+          <div class="features-item" data-feature="4">
+            <div class="features-item-icon">👥</div>
+            <div class="features-item-content">
+              <h3>Comunidade de Estudantes</h3>
+              <p>Interaja, compartilhe metas e mantenha a motivação com outros estudantes como você.</p>
+            </div>
+            <span class="features-item-arrow">→</span>
+          </div>
+        </div>
+        <div class="features-visual reveal reveal-d1">
+          <div class="features-card-highlight" id="featureHighlight">
+            <div class="features-card-icon" id="featureIcon">🧠</div>
+            <div class="features-card-title" id="featureTitle">IA Adaptativa</div>
+            <div class="features-card-desc" id="featureDesc">Ajusta automaticamente seus ciclos de foco baseado no seu comportamento, identificando padrões de distração e sugerindo pausas estratégicas para maximizar seu desempenho.</div>
+            <div class="features-card-tags" id="featureTags">
+              <span class="features-card-tag">Inteligência Artificial</span>
+              <span class="features-card-tag">Personalização</span>
+            </div>
+            <div class="features-indicators">
+              <button class="features-dot active" data-index="0"></button>
+              <button class="features-dot" data-index="1"></button>
+              <button class="features-dot" data-index="2"></button>
+              <button class="features-dot" data-index="3"></button>
+              <button class="features-dot" data-index="4"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="comparison" id="comparison">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">Comparativo</div>
+        <h2 class="section-title">FocusBud vs. Concorrentes</h2>
+        <p class="section-sub">Veja por que o FocusBud é a solução mais completa do mercado.</p>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><div class="comp-product"><span class="comp-badge">Melhor</span><span class="comp-product-name">FocusBud</span><span class="comp-product-price">R$ 19,90/mês</span></div></th>
+              <th><div class="comp-product"><span class="comp-product-name">Forest</span><span class="comp-product-price">R$ 9,90</span></div></th>
+              <th><div class="comp-product"><span class="comp-product-name">Focusmate</span><span class="comp-product-price">US$ 5/mês</span></div></th>
+              <th><div class="comp-product"><span class="comp-product-name">Notion+Timer</span><span class="comp-product-price">Grátis</span></div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>IA Adaptativa</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Pomodoro Inteligente</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Música Lo-fi</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Relatórios</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Comunidade</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Detecção de Distrações</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td></tr>
+            <tr><td>Personalização Total</td><td class="hl"><span class="comp-check">✓</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-dash">—</span></td><td><span class="comp-check">✓</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="benefits" id="benefits">
+    <div class="container">
+      <div class="benefits-layout">
+        <div class="benefits-circle-wrap reveal">
+          <div class="benefits-circle">
+            <div class="benefits-circle-inner">
+              <div class="benefits-circle-pct"><span class="count-up" data-target="92">0</span>%</div>
+              <div class="benefits-circle-label">dos usuários veem <br/>melhora em 7 dias</div>
+            </div>
+          </div>
+        </div>
+        <div class="benefits-list reveal reveal-d1">
+          <div class="section-label">Resultados</div>
+          <h2 class="section-title">O que você ganha</h2>
+          <p class="section-sub">Números que mostram a diferença do FocusBud na sua rotina.</p>
+
+          <div class="benefit-row">
+            <div class="benefit-row-icon">📈</div>
+            <div class="benefit-row-content">
+              <div class="benefit-row-value">+73%</div>
+              <div class="benefit-row-label">Mais produtividade</div>
+              <div class="benefit-row-desc">Aumento nas horas de estudo produtivo</div>
+            </div>
+            <div class="benefit-row-bar"><div class="benefit-row-bar-fill" data-width="73"></div></div>
+          </div>
+
+          <div class="benefit-row">
+            <div class="benefit-row-icon">😌</div>
+            <div class="benefit-row-content">
+              <div class="benefit-row-value">-45%</div>
+              <div class="benefit-row-label">Menos estresse</div>
+              <div class="benefit-row-desc">Redução na ansiedade com ciclos organizados</div>
+            </div>
+            <div class="benefit-row-bar"><div class="benefit-row-bar-fill" data-width="45"></div></div>
+          </div>
+
+          <div class="benefit-row">
+            <div class="benefit-row-icon">🎯</div>
+            <div class="benefit-row-content">
+              <div class="benefit-row-value">2×</div>
+              <div class="benefit-row-label">Retenção de conteúdo</div>
+              <div class="benefit-row-desc">Pausas estratégicas nos momentos certos</div>
+            </div>
+            <div class="benefit-row-bar"><div class="benefit-row-bar-fill" data-width="100"></div></div>
+          </div>
+
+          <div class="benefit-row">
+            <div class="benefit-row-icon">🔥</div>
+            <div class="benefit-row-content">
+              <div class="benefit-row-value">+60%</div>
+              <div class="benefit-row-label">Motivação constante</div>
+              <div class="benefit-row-desc">Comunidade e desafios mantêm o engajamento</div>
+            </div>
+            <div class="benefit-row-bar"><div class="benefit-row-bar-fill" data-width="60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">Como Funciona</div>
+        <h2 class="section-title">Começar é simples</h2>
+        <p class="section-sub">Em 4 passos você transforma sua rotina de estudos com inteligência artificial.</p>
+      </div>
+      <div class="how-grid">
+        <div class="how-card reveal reveal-d1">
+          <div class="how-num">1</div>
+          <h3>Configure seu perfil</h3>
+          <p>Informe seus hábitos e metas. Quanto mais você compartilha, mais a IA aprende sobre você.</p>
+        </div>
+        <div class="how-card reveal reveal-d2">
+          <div class="how-num">2</div>
+          <h3>IA analisa seus hábitos</h3>
+          <p>A inteligência artificial identifica seus padrões de concentração e momentos de pico.</p>
+        </div>
+        <div class="how-card reveal reveal-d3">
+          <div class="how-num">3</div>
+          <h3>Ciclos personalizados</h3>
+          <p>Receba sessões de foco sob medida com pausas estratégicas nos melhores horários.</p>
+        </div>
+        <div class="how-card reveal reveal-d4">
+          <div class="how-num">4</div>
+          <h3>Acompanhe sua evolução</h3>
+          <p>Relatórios detalhados mostram seu progresso e a IA sugere ajustes contínuos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">Depoimentos</div>
+        <h2 class="section-title">Quem usa, recomenda</h2>
+        <p class="section-sub">Estudantes como você já transformaram sua rotina com o FocusBud.</p>
+      </div>
+      <div class="testi-grid">
+        <div class="testi-card reveal reveal-d1">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Nunca consegui manter uma rotina de estudos por mais de uma semana. Com o FocusBud, já estou há 3 meses consistente. A IA realmente entende meu ritmo."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">GS</div>
+            <div>
+              <div class="testi-name">Gabriel Santos</div>
+              <div class="testi-role">USP</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card featured reveal reveal-d2">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"O relatório de produtividade mudou minha forma de estudar. Descobri que rendo muito mais pela manhã e a IA ajustou meus ciclos. Genial!"</p>
+          <div class="testi-author">
+            <div class="testi-avatar">AL</div>
+            <div>
+              <div class="testi-name">Ana Luísa Oliveira</div>
+              <div class="testi-role">UFMG — Medicina</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card reveal reveal-d3">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Sempre usei Pomodoro tradicional, mas o inteligente do FocusBud é outro nível. As pausas acontecem quando estou perdendo o foco. É assustador de preciso."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">PM</div>
+            <div>
+              <div class="testi-name">Pedro Martins</div>
+              <div class="testi-role">UNICAMP — Engenharia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="cta-bg"></div>
+    <div class="cta-grid"></div>
+    <div class="container">
+      <h2 class="reveal">Pronto para estudar com mais foco?</h2>
+      <p class="reveal reveal-d1">Mais de 10 mil estudantes já transformaram sua produtividade. Comece sua jornada agora.</p>
+      <div class="reveal reveal-d2">
+        <a href="#" class="btn btn-primary">Começar por R$ 19,90/mês</a>
+      </div>
+      <p class="cta-meta reveal reveal-d3">Cancele quando quiser · <strong>7 dias grátis</strong> · Sem compromisso</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <span class="logo-icon"><img src="logo/image-removebg-preview.png" alt="FocusBud" /></span>
+            FocusBud
+          </a>
+          <p>Transforme distração em produtividade. O primeiro app que combina IA, Pomodoro inteligente e música lo-fi para potencializar seus estudos.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Twitter/X">𝕏</a>
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="TikTok">♪</a>
+            <a href="#" aria-label="Discord">◆</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Produto</h4>
+          <ul>
+            <li><a href="#features">Funcionalidades</a></li>
+            <li><a href="#how">Como funciona</a></li>
+            <li><a href="#comparison">Comparativo</a></li>
+            <li><a href="#cta">Preços</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <ul>
+            <li><a href="#">Sobre</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Carreiras</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Suporte</h4>
+          <ul>
+            <li><a href="#">Central de Ajuda</a></li>
+            <li><a href="#">Política de Privacidade</a></li>
+            <li><a href="#">Termos de Uso</a></li>
+            <li><a href="#">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 FocusBud. Todos os direitos reservados.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacidade</a>
+          <a href="#">Termos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // ─── NAVBAR ───
+      const navbar = document.getElementById('navbar');
+      const mobileToggle = document.getElementById('mobileToggle');
+      const navLinks = document.getElementById('navLinks');
+
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
+      });
+
+      mobileToggle.addEventListener('click', () => {
+        mobileToggle.classList.toggle('active');
+        navLinks.classList.toggle('open');
+      });
+
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileToggle.classList.remove('active');
+          navLinks.classList.remove('open');
+        });
+      });
+
+      // ─── SMOOTH SCROLL ───
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', e => {
+          e.preventDefault();
+          const target = document.querySelector(anchor.getAttribute('href'));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      // ─── SPOTLIGHT ───
+      const spotlight = document.getElementById('spotlight');
+      let spotlightVisible = false;
+
+      document.addEventListener('mousemove', e => {
+        spotlight.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+        if (!spotlightVisible) { spotlight.style.opacity = '1'; spotlightVisible = true; }
+      });
+      document.addEventListener('mouseleave', () => {
+        spotlight.style.opacity = '0'; spotlightVisible = false;
+      });
+
+      // ─── PARTICLES ───
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = 2 + Math.random() * 3;
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%'; p.style.top = Math.random() * 100 + '%';
+        p.style.animation = `float ${8 + Math.random() * 12}s ease-in-out infinite`;
+        p.style.animationDelay = Math.random() * 5 + 's';
+        p.style.opacity = 0.06 + Math.random() * 0.1;
+        if (Math.random() > 0.5) p.style.background = 'var(--color-secondary)';
+        particlesContainer.appendChild(p);
+      }
+
+      // ─── REVEAL ───
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+      // ─── COUNTERS ───
+      const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.getAttribute('data-target'));
+            if (!target) return;
+            let current = 0;
+            const step = Math.ceil(target / 40);
+            const timer = setInterval(() => {
+              current += step;
+              if (current >= target) { current = target; clearInterval(timer); }
+              el.textContent = current;
+            }, 40);
+            counterObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      document.querySelectorAll('.count-up').forEach(el => counterObserver.observe(el));
+
+      // ─── BENEFIT BARS ───
+      const barObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bar = entry.target;
+            const width = bar.getAttribute('data-width');
+            if (width) bar.style.width = width + '%';
+            barObserver.unobserve(bar);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      document.querySelectorAll('.benefit-row-bar-fill').forEach(el => barObserver.observe(el));
+
+      // ─── DASHBOARD BARS ───
+      setInterval(() => {
+        document.querySelectorAll('.dash-bar').forEach(bar => {
+          bar.classList.toggle('active', Math.random() > 0.25);
+        });
+      }, 2200);
+
+      // ─── FEATURES INTERACTION ───
+      const featureData = [
+        { icon: '🧠', title: 'IA Adaptativa', desc: 'Ajusta automaticamente seus ciclos de foco baseado no seu comportamento, identificando padrões de distração e sugerindo pausas estratégicas para maximizar seu desempenho.', tags: ['Inteligência Artificial', 'Personalização'] },
+        { icon: '⏱️', title: 'Pomodoro Inteligente', desc: 'Sessões personalizadas que se adaptam ao seu ritmo. O cronômetro aprende quando você rende mais e ajusta os intervalos para maximizar sua produtividade.', tags: ['Produtividade', 'Timer'] },
+        { icon: '🎵', title: 'Música Lo-fi para Foco', desc: 'Playlist integrada com músicas lo-fi selecionadas para concentração profunda. Ambiente sonoro ideal para entrar no flow dos estudos sem interrupções.', tags: ['Música', 'Foco'] },
+        { icon: '📊', title: 'Relatórios Inteligentes', desc: 'Análises visuais completas com métricas de desempenho, gráficos de evolução e insights personalizados para ajudar você a melhorar seus hábitos.', tags: ['Análise', 'Métricas'] },
+        { icon: '👥', title: 'Comunidade de Estudantes', desc: 'Interaja com outros estudantes, compartilhe metas, participe de desafios e mantenha a motivação em grupo. Juntos vocês vão mais longe.', tags: ['Social', 'Motivação'] }
+      ];
+
+      const featureItems = document.querySelectorAll('.features-item');
+      const featureDots = document.querySelectorAll('.features-dot');
+      const featureIcon = document.getElementById('featureIcon');
+      const featureTitle = document.getElementById('featureTitle');
+      const featureDesc = document.getElementById('featureDesc');
+      const featureTags = document.getElementById('featureTags');
+
+      function setFeature(index) {
+        const data = featureData[index];
+
+        featureIcon.style.opacity = '0';
+        featureTitle.style.opacity = '0';
+        featureDesc.style.opacity = '0';
+        featureTags.style.opacity = '0';
+
+        setTimeout(() => {
+          featureIcon.textContent = data.icon;
+          featureTitle.textContent = data.title;
+          featureDesc.textContent = data.desc;
+          featureTags.innerHTML = data.tags.map(t => `<span class="features-card-tag">${t}</span>`).join('');
+          featureIcon.style.opacity = '1';
+          featureTitle.style.opacity = '1';
+          featureDesc.style.opacity = '1';
+          featureTags.style.opacity = '1';
+        }, 200);
+
+        featureItems.forEach((item, i) => {
+          item.classList.toggle('active', i === index);
+        });
+        featureDots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+        });
+      }
+
+      featureItems.forEach((item, index) => {
+        item.addEventListener('click', () => setFeature(index));
+        item.addEventListener('mouseenter', () => setFeature(index));
+      });
+
+      featureDots.forEach(dot => {
+        dot.addEventListener('click', () => setFeature(parseInt(dot.dataset.index)));
+      });
+
+    });
+  </script>
+</body>
+</html>
