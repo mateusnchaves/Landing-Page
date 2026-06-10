@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FocusBud — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --purple:#534AB7;
+  --purple-light:#756EE6;
+  --purple-dark:#3D35A0;
+  --purple-glow:rgba(83,74,183,0.4);
+  --purple-bg:rgba(83,74,183,0.10);
+  --green:#1D9E75;
+  --green-light:#28C78E;
+  --green-glow:rgba(29,158,117,0.3);
+  --green-bg:rgba(29,158,117,0.08);
+  --lavender:#EEEDFE;
+  --lavender-dim:rgba(238,237,254,0.04);
+  --dark:#2C2C2A;
+  --bg:#07070E;
+  --bg-raised:#0A0A16;
+  --bg-card:rgba(16,16,30,0.6);
+  --bg-card-hover:rgba(22,22,42,0.7);
+  --bg-glass:rgba(12,12,24,0.75);
+  --text:#EEEEF4;
+  --text-muted:#8888A0;
+  --text-light:#5A5A78;
+  --border:rgba(255,255,255,0.04);
+  --border-card:rgba(255,255,255,0.05);
+  --border-hover:rgba(83,74,183,0.15);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius-xs:6px;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --radius-xl:32px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --ease-out:cubic-bezier(0,0,0.2,1);
+  --duration:0.5s;
+  --sidebar-w:256px;
+  --header-h:72px
+}
+
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;display:flex;min-height:100vh}
+::selection{background:var(--purple);color:#fff}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.05);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.1)}
+
+/* ===== BG LIGHTING ===== */
+.bg-glow{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(100px);opacity:0.5}
+.bg-glow-1{width:560px;height:560px;top:-120px;left:260px;background:var(--purple-glow);opacity:0.12}
+.bg-glow-2{width:400px;height:400px;bottom:120px;right:-80px;background:var(--green-glow);opacity:0.06}
+.bg-glow-3{width:300px;height:300px;top:50%;left:50%;background:rgba(83,74,183,0.08);opacity:0.08}
+
+/* ===== SIDEBAR ===== */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-glass);backdrop-filter:blur(28px) saturate(1.5);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform var(--duration) var(--ease)}
+.sidebar-logo{display:flex;align-items:center;gap:12px;padding:22px 24px 20px;font-weight:800;font-size:1.1rem;color:var(--text);border-bottom:1px solid var(--border);flex-shrink:0;letter-spacing:-0.01em}
+.sidebar-logo-img{width:30px;height:30px;border-radius:7px;overflow:hidden;flex-shrink:0}
+.sidebar-logo-img img{width:100%;height:100%;object-fit:contain}
+.sidebar-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sidebar-link{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-xs);font-size:0.85rem;font-weight:500;color:var(--text-muted);text-decoration:none;transition:all 0.2s var(--ease-out);cursor:pointer;position:relative}
+.sidebar-link:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+.sidebar-link.active{background:var(--purple-bg);color:var(--lavender)}
+.sidebar-link.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:0 3px 3px 0;background:var(--purple);box-shadow:0 0 10px var(--purple-glow)}
+.sidebar-link-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;opacity:0.8}
+.sidebar-link-label{flex:1}
+.sidebar-profile{padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.sidebar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;flex-shrink:0;box-shadow:0 0 0 2px rgba(83,74,183,0.15)}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:0.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-plan{font-size:0.62rem;color:var(--green-light);font-weight:600;display:flex;align-items:center;gap:4px}
+.sidebar-user-plan::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green-glow)}
+
+/* ===== MAIN ===== */
+.main-wrapper{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1}
+
+/* ===== HEADER ===== */
+.header{height:var(--header-h);padding:0 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(7,7,14,0.85);backdrop-filter:blur(18px);position:sticky;top:0;z-index:50;flex-shrink:0}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-greeting{font-size:1.12rem;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:-0.01em}
+.header-sub{font-size:0.78rem;color:var(--text-muted);font-weight:500;margin-top:1px}
+.header-sub strong{color:var(--text);font-weight:600}
+.header-right{display:flex;align-items:center;gap:6px}
+.header-btn{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,0.02);color:var(--text-muted);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s var(--ease-out);position:relative}
+.header-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.header-btn .badge{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--purple);color:#fff;font-size:0.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px var(--purple-glow)}
+.header-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light),var(--green));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;color:#fff;cursor:pointer;margin-left:4px;transition:opacity 0.2s;box-shadow:0 0 0 2px rgba(255,255,255,0.03)}
+.header-avatar:hover{opacity:0.8}
+
+/* ===== CONTENT ===== */
+.main-content{padding:32px 40px 48px;flex:1;position:relative;z-index:1}
+
+/* ===== ASYMMETRIC GRID ===== */
+.dashboard-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:start}
+.dashboard-grid .full-w{grid-column:1/-1}
+
+/* ===== CARD SYSTEM ===== */
+.card{background:var(--bg-card);backdrop-filter:blur(14px);border:1px solid var(--border-card);border-radius:var(--radius-lg);padding:28px;transition:all var(--duration) var(--ease);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(83,74,183,0.03),transparent 60%);opacity:0;transition:opacity var(--duration) var(--ease);pointer-events:none}
+.card:hover{border-color:var(--border-hover);transform:translateY(-3px)}
+.card:hover::before{opacity:1}
+
+/* Elevation levels */
+.card-el-2{box-shadow:0 4px 24px rgba(0,0,0,0.25)}
+.card-el-2:hover{box-shadow:0 12px 40px rgba(0,0,0,0.35),0 0 0 1px rgba(83,74,183,0.06)}
+.card-el-3{box-shadow:0 8px 40px rgba(0,0,0,0.3)}
+.card-el-3:hover{box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px var(--purple-glow)}
+.card-el-1{box-shadow:none}
+.card-el-1:hover{box-shadow:0 4px 20px rgba(0,0,0,0.2),0 0 0 1px rgba(83,74,183,0.04)}
+
+.card-title{font-size:0.78rem;font-weight:600;color:var(--text-light);margin-bottom:18px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:0.3px}
+
+/* ===== TIMER — HERO ===== */
+.timer-card{grid-row:span 3;text-align:center;padding:44px 32px 36px;background:var(--bg-card);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-card::after{content:'';position:absolute;top:-40%;left:-40%;width:180%;height:180%;background:radial-gradient(circle at 50% 50%,var(--purple-glow),transparent 60%);opacity:0.06;animation:breath 5s var(--ease) infinite;pointer-events:none}
+@keyframes breath{0%,100%{opacity:0.04;transform:scale(1)}50%{opacity:0.12;transform:scale(1.06)}}
+
+.timer-hero-glow{position:absolute;top:50%;left:50%;width:320px;height:320px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--purple-glow),transparent 70%);opacity:0.08;animation:breath 4s var(--ease) infinite;pointer-events:none}
+.timer-ring-wrap{position:relative;width:240px;height:240px;margin:0 auto 28px}
+.timer-ring-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-ring-bg{fill:none;stroke:rgba(255,255,255,0.03);stroke-width:6}
+.timer-ring-progress{fill:none;stroke:url(#timerGradient);stroke-width:6;stroke-linecap:round;stroke-dasharray:678.58;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 12px rgba(83,74,183,0.3))}
+.timer-ring-glow-outer{position:absolute;top:-12px;left:-12px;width:264px;height:264px;border-radius:50%;background:var(--purple-glow);filter:blur(32px);opacity:0.08;animation:breath 4s var(--ease) infinite;pointer-events:none}
+.timer-ring-glow-inner{position:absolute;top:50%;left:50%;width:200px;height:200px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(83,74,183,0.06),transparent 70%);pointer-events:none}
+.timer-display{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.timer-time{font-size:4rem;font-weight:800;letter-spacing:-0.03em;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
+.timer-label{font-size:0.72rem;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px}
+.timer-actions{display:flex;gap:14px;justify-content:center;position:relative;z-index:2}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:50px;font-weight:600;font-size:0.88rem;border:none;cursor:pointer;transition:all 0.3s var(--ease-out);font-family:var(--font);position:relative}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;box-shadow:0 4px 24px var(--purple-glow)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px var(--purple-glow)}
+.btn-primary:active{transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,0.03);color:var(--text);border:1px solid rgba(255,255,255,0.07)}
+.btn-secondary:hover{background:rgba(255,255,255,0.07);transform:translateY(-3px);border-color:rgba(255,255,255,0.12)}
+.btn-ghost{background:transparent;color:var(--text-muted);padding:10px 16px;font-size:0.82rem;border:1px solid transparent}
+.btn-ghost:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+
+/* ===== AI CARD ===== */
+.ai-card{position:relative;overflow:hidden;background:var(--bg-card)}
+.ai-card::after{content:'';position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(83,74,183,0.06),transparent 70%);pointer-events:none}
+.ai-insight-highlight{padding:16px 18px;background:linear-gradient(135deg,var(--purple-bg),transparent);border:1px solid rgba(83,74,183,0.1);border-radius:var(--radius-sm);margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.ai-insight-highlight-icon{width:40px;height:40px;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--purple),var(--purple-light));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 0 16px var(--purple-glow)}
+.ai-insight-highlight-text{flex:1}
+.ai-insight-highlight-text strong{display:block;font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.ai-insight-highlight-text span{font-size:0.78rem;color:var(--text-muted)}
+.ai-message{font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin-bottom:14px}
+.ai-insights{display:flex;flex-direction:column;gap:8px}
+.ai-suggestion{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:rgba(255,255,255,0.02);border-radius:var(--radius-xs);border:1px solid var(--border);transition:all 0.2s var(--ease-out)}
+.ai-suggestion:hover{background:rgba(255,255,255,0.03);border-color:rgba(83,74,183,0.1)}
+.ai-suggestion-icon{font-size:0.85rem;flex-shrink:0;margin-top:2px}
+.ai-suggestion-text{font-size:0.78rem;color:var(--text-muted);line-height:1.5}
+.ai-suggestion-text strong{color:var(--text);font-weight:600}
+
+/* ===== STATS ===== */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-item{padding:16px 14px;background:rgba(255,255,255,0.02);border-radius:var(--radius-sm);border:1px solid var(--border);transition:all 0.2s var(--ease-out);position:relative;overflow:hidden}
+.stat-item:hover{background:rgba(255,255,255,0.03);border-color:rgba(83,74,183,0.08)}
+.stat-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.stat-value{font-size:1.5rem;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-0.02em}
+.stat-value .stat-unit{font-size:0.75rem;font-weight:600;color:var(--text-muted)}
+.stat-label{font-size:0.68rem;color:var(--text-light);font-weight:500;margin-top:3px}
+.stat-trend{font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:50px;flex-shrink:0;margin-top:2px}
+.stat-trend.up{color:var(--green-light);background:var(--green-bg)}
+.stat-trend.down{color:#e74c5c;background:rgba(231,76,92,0.08)}
+.stat-sparkline{width:100%;height:20px;margin-top:8px;opacity:0.5}
+.stat-sparkline svg{width:100%;height:100%}
+.stat-bar{width:100%;height:3px;border-radius:2px;background:rgba(255,255,255,0.03);margin-top:10px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green),var(--green-light));width:0;transition:width 1.5s var(--ease)}
+
+/* ===== WEEKLY CHART ===== */
+.chart-card{position:relative}
+.chart-card::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:60%;background:radial-gradient(ellipse at 50% 100%,rgba(29,158,117,0.04),transparent 70%);pointer-events:none}
+.chart-wrap{position:relative;width:100%;height:170px}
+.chart-wrap svg{width:100%;height:100%}
+.chart-labels{display:flex;justify-content:space-between;margin-top:10px;padding:0 2px}
+.chart-label{font-size:0.62rem;color:var(--text-light);font-weight:500;text-align:center;flex:1}
+.chart-tooltip{position:absolute;background:var(--bg-glass);backdrop-filter:blur(16px);border:1px solid var(--border-strong);border-radius:var(--radius-xs);padding:7px 11px;font-size:0.72rem;font-weight:600;color:var(--text);pointer-events:none;opacity:0;transition:opacity 0.2s;white-space:nowrap;z-index:5;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.chart-tooltip.visible{opacity:1}
+
+/* ===== MUSIC ===== */
+.music-player{display:flex;align-items:center;gap:20px}
+.music-cover{width:68px;height:68px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#2D1B69,#1D9E75);flex-shrink:0;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.music-cover::after{content:'🎵';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.6rem;opacity:0.5}
+.music-info{flex:1;min-width:0}
+.music-title{font-size:0.88rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.music-artist{font-size:0.72rem;color:var(--text-muted);font-weight:500;margin-top:1px}
+.music-controls{display:flex;align-items:center;gap:10px;margin-top:10px}
+.music-btn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.03);color:var(--text-muted);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s var(--ease-out)}
+.music-btn:hover{background:rgba(255,255,255,0.07);color:var(--text)}
+.music-btn.play-btn{width:42px;height:42px;background:var(--purple);color:#fff;font-size:0.9rem;box-shadow:0 0 16px var(--purple-glow)}
+.music-btn.play-btn:hover{background:var(--purple-light);box-shadow:0 0 24px var(--purple-glow)}
+.music-progress-wrap{display:flex;align-items:center;gap:10px;margin-top:14px}
+.music-progress-bar{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.04);cursor:pointer;position:relative;overflow:hidden}
+.music-progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--purple-light));width:0;transition:width 1s linear}
+.music-time{font-size:0.62rem;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;min-width:32px}
+/* Equalizer */
+.equalizer{display:flex;align-items:center;gap:3px;height:28px;margin-top:8px}
+.eq-bar{width:3px;border-radius:2px;background:var(--purple);opacity:0.3;animation:eqPulse 1.2s var(--ease) infinite;transform-origin:bottom}
+.eq-bar.active{opacity:0.7}
+.eq-bar:nth-child(1){height:40%;animation-delay:0s}
+.eq-bar:nth-child(2){height:70%;animation-delay:0.15s}
+.eq-bar:nth-child(3){height:50%;animation-delay:0.3s}
+.eq-bar:nth-child(4){height:90%;animation-delay:0.1s}
+.eq-bar:nth-child(5){height:60%;animation-delay:0.4s}
+.eq-bar:nth-child(6){height:80%;animation-delay:0.2s}
+.eq-bar:nth-child(7){height:45%;animation-delay:0.35s}
+.eq-bar:nth-child(8){height:75%;animation-delay:0.05s}
+@keyframes eqPulse{0%,100%{transform:scaleY(0.6)}50%{transform:scaleY(1)}}
+
+/* ===== COMMUNITY ===== */
+.community-online{display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--green-bg);border:1px solid rgba(29,158,117,0.08);border-radius:var(--radius-sm);margin-bottom:16px}
+.community-online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green-glow);animation:pulse 2.5s var(--ease) infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+.community-online-text{font-size:0.82rem;font-weight:600;color:var(--text)}
+.community-online-text strong{color:var(--green-light)}
+.community-ranking{margin-bottom:14px}
+.community-ranking-title{font-size:0.72rem;color:var(--text-light);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px}
+.ranking-item{display:flex;align-items:center;gap:10px;padding:5px 0}
+.ranking-pos{width:20px;font-size:0.72rem;font-weight:700;color:var(--text-light);text-align:center}
+.ranking-name{font-size:0.78rem;color:var(--text);font-weight:500;flex:1}
+.ranking-score{font-size:0.72rem;color:var(--text-muted);font-weight:500}
+.community-friends{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.community-friends-label{font-size:0.68rem;color:var(--text-light);font-weight:500;margin-right:2px}
+.friend-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;color:#fff;border:2px solid var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,0.03)}
+.friend-avatar-more{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.03);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--text-muted);font-weight:600}
+
+/* ===== AI ASSISTANT ===== */
+.assistant-chat{display:flex;flex-direction:column}
+.assistant-message{display:flex;gap:12px;margin-bottom:14px}
+.assistant-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green));display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;box-shadow:0 0 12px var(--purple-glow)}
+.assistant-bubble{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px 12px 12px 4px;padding:11px 15px;font-size:0.82rem;color:var(--text);line-height:1.6;max-width:75%}
+.assistant-input-wrap{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:50px;padding:3px 3px 3px 18px;transition:all 0.2s var(--ease)}
+.assistant-input-wrap:focus-within{border-color:rgba(83,74,183,0.2);background:rgba(255,255,255,0.03);box-shadow:0 0 0 4px rgba(83,74,183,0.04)}
+.assistant-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:0.82rem;font-family:var(--font);padding:9px 0}
+.assistant-input::placeholder{color:var(--text-light)}
+.assistant-send{width:34px;height:34px;border-radius:50%;border:none;background:var(--purple);color:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s var(--ease-out);flex-shrink:0;box-shadow:0 0 12px var(--purple-glow)}
+.assistant-send:hover{background:var(--purple-light);box-shadow:0 0 20px var(--purple-glow);transform:scale(1.05)}
+
+/* ===== STAGGER ANIMATIONS ===== */
+.stagger{opacity:0;transform:translateY(24px)}
+.stagger.show{animation:staggerIn 0.7s var(--ease) forwards}
+@keyframes staggerIn{to{opacity:1;transform:translateY(0)}}
+
+.stagger-scale{opacity:0;transform:scale(0.94)}
+.stagger-scale.show{animation:staggerScale 0.6s var(--ease) forwards}
+@keyframes staggerScale{to{opacity:1;transform:scale(1)}}
+
+/* ===== RESPONSIVE ===== */
+.sidebar-toggle{display:none;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,0.02);color:var(--text-muted);font-size:1.2rem;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+.sidebar-toggle:hover{background:rgba(255,255,255,0.06)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:99;opacity:0;transition:opacity 0.4s var(--ease)}
+.sidebar-overlay.show{opacity:1}
+
+@media(max-width:1200px){
+  .main-content{padding:24px 24px 40px}
+  .header{padding:0 24px}
+}
+
+@media(max-width:968px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{display:block;pointer-events:none}
+  .sidebar-overlay.show{pointer-events:auto}
+  .sidebar-toggle{display:flex}
+  .main-wrapper{margin-left:0}
+  .dashboard-grid{grid-template-columns:1fr}
+  .timer-card{grid-row:auto}
+  .timer-ring-wrap{width:200px;height:200px}
+  .timer-ring-glow-outer{width:224px;height:224px}
+  .timer-time{font-size:3.2rem}
+  .main-content{padding:20px 16px 32px}
+  .header{padding:0 16px;height:64px}
+  .header-greeting{font-size:1rem}
+  .header-sub{font-size:0.7rem}
+}
+
+@media(max-width:600px){
+  .stats-grid{gap:8px}
+  .stat-item{padding:14px 12px}
+  .stat-value{font-size:1.3rem}
+  .timer-ring-wrap{width:170px;height:170px}
+  .timer-ring-glow-outer{width:194px;height:194px}
+  .timer-time{font-size:2.7rem}
+  .timer-card{padding:32px 20px 28px}
+  .card{padding:20px}
+  .music-player{flex-direction:column;align-items:flex-start;gap:14px}
+  .music-cover{width:56px;height:56px}
+  .header-btn .badge{width:14px;height:14px;font-size:0.45rem;top:2px;right:2px}
+  .equalizer{height:22px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-img"><img src="logo/image-removebg-preview.png" alt="FocusBud" /></div>
+    FocusBud
+  </div>
+  <nav class="sidebar-nav">
+    <a class="sidebar-link active"><span class="sidebar-link-icon">🏠</span><span class="sidebar-link-label">Dashboard</span></a>
+    <a class="sidebar-link"><span class="sidebar-link-icon">⏱</span><span class="sidebar-link-label">Sessões de Foco</span></a>
+    <a class="sidebar-link"><span class="sidebar-link-icon">📊</span><span class="sidebar-link-label">Estatísticas</span></a>
+    <a class="sidebar-link"><span class="sidebar-link-icon">🎵</span><span class="sidebar-link-label">Música Lo-fi</span></a>
+    <a class="sidebar-link"><span class="sidebar-link-icon">🤖</span><span class="sidebar-link-label">IA Assistente</span></a>
+    <a class="sidebar-link"><span class="sidebar-link-icon">👥</span><span class="sidebar-link-label">Comunidade</span></a>
+    <div style="flex:1;min-height:12px"></div>
+    <a class="sidebar-link"><span class="sidebar-link-icon">⚙</span><span class="sidebar-link-label">Configurações</span></a>
+  </nav>
+  <div class="sidebar-profile">
+    <div class="sidebar-avatar">GS</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name">Gabriel Santos</div>
+      <div class="sidebar-user-plan">Plano Premium</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+
+  <header class="header">
+    <div class="header-left">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu">☰</button>
+      <div>
+        <div class="header-greeting" id="greeting">Bom dia, Gabriel 👋</div>
+        <div class="header-sub">Você já estudou <strong>14 horas</strong> esta semana.</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" aria-label="Notificações">🔔<span class="badge">3</span></button>
+      <button class="header-btn" aria-label="Configurações rápidas">⚙</button>
+      <div class="header-avatar">GS</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <div class="dashboard-grid">
+
+      <!-- TIMER — Hero -->
+      <div class="card timer-card card-el-3 stagger" style="--order:0" data-stagger>
+        <div class="timer-hero-glow"></div>
+        <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--purple)"/><stop offset="100%" stop-color="var(--green)"/></linearGradient></defs></svg>
+        <div class="timer-ring-wrap">
+          <div class="timer-ring-glow-outer"></div>
+          <div class="timer-ring-glow-inner"></div>
+          <svg class="timer-ring-svg" viewBox="0 0 216 216">
+            <circle class="timer-ring-bg" cx="108" cy="108" r="98"/>
+            <circle class="timer-ring-progress" id="timerRing" cx="108" cy="108" r="98"/>
+          </svg>
+          <div class="timer-display">
+            <div class="timer-time" id="timerDisplay">25:00</div>
+            <div class="timer-label" id="timerState">Foco</div>
+          </div>
+        </div>
+        <div class="timer-actions">
+          <button class="btn btn-primary" id="timerStart">▶ Iniciar Sessão</button>
+          <button class="btn btn-secondary" id="timerPause" style="display:none">⏸ Pausa</button>
+          <button class="btn-ghost" id="timerReset" style="display:none">↻</button>
+        </div>
+      </div>
+
+      <!-- AI Analysis -->
+      <div class="card ai-card card-el-2 stagger" style="--order:1" data-stagger>
+        <div class="card-title">🤖 Análise da IA</div>
+        <div class="ai-insight-highlight">
+          <div class="ai-insight-highlight-icon">🧠</div>
+          <div class="ai-insight-highlight-text">
+            <strong>Pico de performance entre 19h e 22h</strong>
+            <span>Baseado em 47 sessões analisadas</span>
+          </div>
+        </div>
+        <div class="ai-insights">
+          <div class="ai-suggestion"><span class="ai-suggestion-icon">🎯</span><span class="ai-suggestion-text"><strong>Reduzir distrações</strong> após 30 minutos de foco contínuo</span></div>
+          <div class="ai-suggestion"><span class="ai-suggestion-icon">☕</span><span class="ai-suggestion-text"><strong>Fazer pausas</strong> de 5 minutos entre ciclos para recuperar</span></div>
+          <div class="ai-suggestion"><span class="ai-suggestion-icon">🎧</span><span class="ai-suggestion-text"><strong>Ouvir</strong> a playlist Deep Focus para concentração total</span></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card card-el-2 stagger" style="--order:2" data-stagger>
+        <div class="card-title">📊 Estatísticas</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-header">
+              <div><div class="stat-value" id="statFocus">0<span class="stat-unit">min</span></div><div class="stat-label">Tempo focado hoje</div></div>
+              <span class="stat-trend up">↑ 12%</span>
+            </div>
+            <div class="stat-sparkline" id="sparkFocus"></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-header">
+              <div><div class="stat-value"><span id="statStreak">0</span><span class="stat-unit">dias</span></div><div class="stat-label">Sequência</div></div>
+              <span class="stat-trend up">↑ 3</span>
+            </div>
+            <div class="stat-sparkline" id="sparkStreak"></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-header">
+              <div><div class="stat-value"><span id="statTasks">0</span></div><div class="stat-label">Tarefas concluídas</div></div>
+              <span class="stat-trend up">↑ 8</span>
+            </div>
+            <div class="stat-sparkline" id="sparkTasks"></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-header">
+              <div><div class="stat-value"><span id="statGoal">0</span><span class="stat-unit">%</span></div><div class="stat-label">Meta semanal</div></div>
+              <span class="stat-trend up">↑ 5%</span>
+            </div>
+            <div class="stat-bar"><div class="stat-bar-fill" id="statGoalFill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Progress -->
+      <div class="card chart-card card-el-2 stagger" style="--order:3" data-stagger>
+        <div class="card-title">📈 Progresso Semanal</div>
+        <div class="chart-wrap" id="chartWrap">
+          <svg viewBox="0 0 340 150" preserveAspectRatio="xMidYMid meet">
+            <defs><linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--green)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs>
+            <path id="chartArea" d="" fill="url(#chartGradient)"/>
+            <path id="chartLine" d="" fill="none" stroke="var(--green-light)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g id="chartDots"></g>
+            <g id="chartGlow"></g>
+          </svg>
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <div class="chart-labels" id="chartLabels"></div>
+      </div>
+
+      <!-- Music -->
+      <div class="card card-el-1 stagger" style="--order:4" data-stagger>
+        <div class="card-title">🎵 Música Lo-fi</div>
+        <div class="music-player">
+          <div class="music-cover"></div>
+          <div class="music-info">
+            <div class="music-title">Deep Focus Lo-Fi</div>
+            <div class="music-artist">FocusBud • Playlist</div>
+            <div class="music-controls">
+              <button class="music-btn" aria-label="Anterior">⏮</button>
+              <button class="music-btn play-btn" id="musicPlay" aria-label="Play/Pause">▶</button>
+              <button class="music-btn" aria-label="Próxima">⏭</button>
+            </div>
+          </div>
+        </div>
+        <div class="music-progress-wrap">
+          <span class="music-time" id="musicCurrent">1:24</span>
+          <div class="music-progress-bar"><div class="music-progress-fill" id="musicProgress"></div></div>
+          <span class="music-time" id="musicTotal">4:02</span>
+        </div>
+        <div class="equalizer" id="equalizer">
+          <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+          <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+        </div>
+      </div>
+
+      <!-- Community -->
+      <div class="card card-el-1 stagger" style="--order:5" data-stagger>
+        <div class="card-title">👥 Comunidade</div>
+        <div class="community-online">
+          <div class="community-online-dot"></div>
+          <div class="community-online-text"><strong>2.300</strong> estudantes estudando agora</div>
+        </div>
+        <div class="community-ranking">
+          <div class="community-ranking-title">🏆 Ranking Semanal</div>
+          <div class="ranking-item"><span class="ranking-pos" style="color:#f6b83e">🥇</span><span class="ranking-name">Ana Beatriz</span><span class="ranking-score">28h 12min</span></div>
+          <div class="ranking-item"><span class="ranking-pos" style="color:#b0b0c0">🥈</span><span class="ranking-name">Lucas Mendes</span><span class="ranking-score">26h 45min</span></div>
+          <div class="ranking-item"><span class="ranking-pos" style="color:#cd7f32">🥉</span><span class="ranking-name">Camila Rocha</span><span class="ranking-score">25h 03min</span></div>
+        </div>
+        <div class="community-friends">
+          <span class="community-friends-label">Amigos online:</span>
+          <div class="friend-avatar" style="background:#534AB7">MR</div>
+          <div class="friend-avatar" style="background:#1D9E75">TL</div>
+          <div class="friend-avatar" style="background:#e67e22">JP</div>
+          <div class="friend-avatar" style="background:#3498db">AS</div>
+          <div class="friend-avatar-more">+3</div>
+        </div>
+      </div>
+
+      <!-- AI Assistant -->
+      <div class="card card-el-2 full-w stagger" style="--order:6" data-stagger>
+        <div class="card-title">🤖 Assistente IA</div>
+        <div class="assistant-chat">
+          <div class="assistant-message">
+            <div class="assistant-avatar">🤖</div>
+            <div class="assistant-bubble">
+              Olá Gabriel. Pronto para sua próxima sessão de foco?<br />
+              Te recomendo um ciclo de <strong>25 minutos</strong> com foco em <strong>matemática</strong>. 🧮
+            </div>
+          </div>
+          <div class="assistant-input-wrap">
+            <input class="assistant-input" type="text" placeholder="Digite sua mensagem..." id="assistantInput" />
+            <button class="assistant-send" id="assistantSend" aria-label="Enviar">➤</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// Greeting
+(function(){const h=new Date().getHours();let g='Boa noite';if(h<6)g='Boa madrugada';else if(h<12)g='Bom dia';else if(h<18)g='Boa tarde';document.getElementById('greeting').textContent=g+', Gabriel 👋'})();
+
+// Sidebar
+const s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),t=document.getElementById('sidebarToggle');
+t.addEventListener('click',()=>{s.classList.add('open');o.classList.add('show')});
+o.addEventListener('click',()=>{s.classList.remove('open');o.classList.remove('show')});
+
+// Timer
+const td=document.getElementById('timerDisplay'),tr=document.getElementById('timerRing'),ts=document.getElementById('timerState');
+const sb=document.getElementById('timerStart'),pb=document.getElementById('timerPause'),rb=document.getElementById('timerReset');
+let ti=null,tt=25*60,rm=tt,ir=false;
+const cc=2*Math.PI*98;
+tr.style.strokeDasharray=cc;
+function ut(){
+  const m=Math.floor(rm/60),s=rm%60;
+  td.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  tr.style.strokeDashoffset=cc*(1-rm/tt);
+  if(rm<=0){clearInterval(ti);ir=false;sb.style.display='inline-flex';pb.style.display='none';rb.style.display='none';ts.textContent='Concluído 🎉';td.textContent='00:00'}
+}
+sb.addEventListener('click',()=>{
+  if(ir)return;
+  if(rm<=0){rm=tt;ts.textContent='Foco'}
+  ir=true;ti=setInterval(()=>{rm--;ut()},1000);
+  sb.style.display='none';pb.style.display='inline-flex';rb.style.display='inline-flex'
+});
+pb.addEventListener('click',()=>{clearInterval(ti);ir=false;sb.style.display='inline-flex';sb.textContent='▶ Continuar';pb.style.display='none'});
+rb.addEventListener('click',()=>{clearInterval(ti);ir=false;rm=tt;ut();ts.textContent='Foco';sb.style.display='inline-flex';sb.textContent='▶ Iniciar Sessão';pb.style.display='none';rb.style.display='none'});
+ut();
+
+// Stagger reveal
+const staggerEls=document.querySelectorAll('[data-stagger]');
+const staggerObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const d=parseFloat(e.target.style.getPropertyValue('--order')||0);
+      setTimeout(()=>e.target.classList.add('show'),d*80);
+      staggerObserver.unobserve(e.target)
+    }
+  })
+},{threshold:0.05});
+staggerEls.forEach(el=>staggerObserver.observe(el));
+
+// Animated counters
+function animCount(el,target,suffix,duration){
+  const st=performance.now();
+  function tick(now){
+    const p=Math.min((now-st)/duration,1),e=1-Math.pow(1-p,3),c=Math.round(0+(target-0)*e);
+    el.textContent=c+(suffix||'');
+    if(p<1)requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
+const statObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const card=e.target;
+      animCount(card.querySelector('#statFocus'),222,'min',1500);
+      animCount(card.querySelector('#statStreak'),12,'',1000);
+      animCount(card.querySelector('#statTasks'),28,'',1200);
+      animCount(card.querySelector('#statGoal'),82,'',1400);
+      setTimeout(()=>{card.querySelector('#statGoalFill').style.width='82%'},300);
+      statObserver.unobserve(card)
+    }
+  })
+},{threshold:0.3});
+const sc=document.querySelector('.stats-grid').closest('.card');
+if(sc)statObserver.observe(sc);
+
+// Sparklines
+function makeSpark(id,vals,color){
+  const el=document.getElementById(id);if(!el)return;
+  const w=80,h=18,px=2,py=2,cw=w-px*2,ch=h-py*2;
+  const mx=Math.max(...vals)*1.15;
+  const pts=vals.map((v,i)=>`${px+(i/(vals.length-1))*cw},${py+ch-(v/mx)*ch}`).join(' ');
+  el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/></svg>`
+}
+makeSpark('sparkFocus',[1.2,2.8,1.5,3.2,2.1,3.7,3.5],'var(--purple-light)');
+makeSpark('sparkStreak',[2,4,3,6,5,8,12],'var(--purple-light)');
+makeSpark('sparkTasks',[5,8,12,10,18,22,28],'var(--purple-light)');
+
+// Weekly chart
+(function(){
+  const data=[{label:'Seg',value:3.2},{label:'Ter',value:4.8},{label:'Qua',value:2.1},{label:'Qui',value:5.5},{label:'Sex',value:4.0},{label:'Sáb',value:6.2},{label:'Dom',value:5.8}];
+  const w=340,h=150,px=28,py=18,cw=w-px*2,ch=h-py*2,mx=Math.max(...data.map(d=>d.value))*1.15;
+  function xp(i){return px+(i/(data.length-1))*cw}
+  function yp(v){return py+ch-(v/mx)*ch}
+  const ld=data.map((d,i)=>(i===0?'M':'L')+xp(i).toFixed(1)+' '+yp(d.value).toFixed(1)).join(' ');
+  document.getElementById('chartLine').setAttribute('d',ld);
+  document.getElementById('chartArea').setAttribute('d',ld+' L'+xp(data.length-1).toFixed(1)+' '+(py+ch)+' L'+xp(0).toFixed(1)+' '+(py+ch)+' Z');
+  let dots='',glow='';
+  data.forEach((d,i)=>{
+    dots+='<circle cx="'+xp(i).toFixed(1)+'" cy="'+yp(d.value).toFixed(1)+'" r="4.5" fill="var(--green-light)" stroke="#07070E" stroke-width="2.5" style="cursor:pointer;" data-day="'+i+'" />';
+    glow+='<circle cx="'+xp(i).toFixed(1)+'" cy="'+yp(d.value).toFixed(1)+'" r="8" fill="var(--green)" opacity="0.1" />'
+  });
+  document.getElementById('chartDots').innerHTML=dots;
+  document.getElementById('chartGlow').innerHTML=glow;
+  let lbl='';
+  data.forEach(d=>{lbl+='<span class="chart-label">'+d.label+'</span>'});
+  document.getElementById('chartLabels').innerHTML=lbl;
+  const tip=document.getElementById('chartTooltip');
+  document.querySelectorAll('#chartDots circle').forEach(el=>{
+    el.addEventListener('mouseenter',function(){
+      const i=parseInt(el.getAttribute('data-day')),d=data[i],h=Math.floor(d.value),m=Math.round((d.value-h)*60);
+      tip.textContent=d.label+' — '+h+'h'+(m>0?String(m).padStart(2,'0'):'00')+'min';
+      tip.classList.add('visible');
+      const r=el.getBoundingClientRect(),w=document.getElementById('chartWrap').getBoundingClientRect();
+      const tx=Math.max(4,Math.min(w.width-tip.offsetWidth-4,r.left-w.left+r.width/2-tip.offsetWidth/2));
+      tip.style.left=tx+'px';tip.style.top=(r.top-w.top-tip.offsetHeight-8)+'px'
+    });
+    el.addEventListener('mouseleave',()=>tip.classList.remove('visible'))
+  });
+  const le=document.getElementById('chartLine'),ae=document.getElementById('chartArea');
+  const co=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var len=le.getTotalLength();
+        le.style.strokeDasharray=len;le.style.strokeDashoffset=len;
+        le.style.transition='stroke-dashoffset 1.4s var(--ease)';
+        ae.style.opacity='0';ae.style.transition='opacity 0.8s ease 0.5s';
+        setTimeout(()=>{le.style.strokeDashoffset='0';ae.style.opacity='1'},200);
+        co.unobserve(e.target)
+      }
+    })
+  },{threshold:0.3});
+  co.observe(document.getElementById('chartWrap'))
+})();
+
+// Music
+(function(){
+  const pb=document.getElementById('musicPlay'),pf=document.getElementById('musicProgress'),ce=document.getElementById('musicCurrent');
+  let pl=false,pr=34,mi,eq=document.querySelectorAll('.eq-bar');
+  pb.addEventListener('click',()=>{
+    pl=!pl;pb.textContent=pl?'⏸':'▶';
+    eq.forEach(b=>b.classList.toggle('active',pl));
+    if(pl){mi=setInterval(()=>{pr=Math.min(pr+0.3,100);pf.style.width=pr+'%';var s=Math.floor(pr/100*242),m=Math.floor(s/60);ce.textContent=m+':'+String(s%60).padStart(2,'0');if(pr>=100){clearInterval(mi);pl=false;pb.textContent='▶';eq.forEach(b=>b.classList.remove('active'))}},1000)}
+    else clearInterval(mi)
+  })
+})();
+
+// Assistant
+(function(){
+  const inp=document.getElementById('assistantInput'),snd=document.getElementById('assistantSend'),ch=document.querySelector('.assistant-chat');
+  function send(){
+    const t=inp.value.trim();if(!t)return;
+    const u=document.createElement('div');u.style.cssText='display:flex;justify-content:flex-end;margin-bottom:12px;';
+    u.innerHTML='<div style="background:rgba(83,74,183,0.12);border:1px solid rgba(83,74,183,0.15);border-radius:12px 12px 4px 12px;padding:10px 16px;font-size:0.82rem;color:var(--text);max-width:80%">'+t.replace(/</g,'&lt;')+'</div>';
+    ch.insertBefore(u,ch.lastElementChild);inp.value='';
+    const r=document.createElement('div');r.className='assistant-message';r.style.opacity='0';
+    r.innerHTML='<div class="assistant-avatar">🤖</div><div class="assistant-bubble">Ótimo! Vou ajustar sua sessão com base nisso. Continue focado! 🚀</div>';
+    ch.insertBefore(r,ch.lastElementChild);
+    setTimeout(()=>{r.style.opacity='1';r.style.transition='opacity 0.4s'},100);
+    ch.scrollTop=ch.scrollHeight
+  }
+  snd.addEventListener('click',send);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')send()})
+})();
+
+// Sidebar nav
+document.querySelectorAll('.sidebar-link').forEach(l=>{
+  l.addEventListener('click',function(){
+    document.querySelectorAll('.sidebar-link').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    if(window.innerWidth<=968){s.classList.remove('open');o.classList.remove('show')}
+  })
+});
+</script>
+</body>
+</html>
